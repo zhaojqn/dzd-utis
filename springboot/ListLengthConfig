@@ -1,0 +1,38 @@
+package com.ipsos.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.support.ConfigurableWebBindingInitializer;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+
+/**
+ * 配置请求集合数组长度
+ * @author dzd
+ * @version 2022年04月15日15:49:44
+ */
+@Configuration
+public class ListLengthConfig {
+
+    @Autowired
+    public ListLengthConfig(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
+        requestMappingHandlerAdapter.setWebBindingInitializer(new MyWebBindingInitializer());
+    }
+
+    /**
+     * 配置请求集合上限数量
+     *
+     * @author dzd
+     * @version 2022年04月15日15:49:44
+     */
+    public static class MyWebBindingInitializer extends ConfigurableWebBindingInitializer {
+
+        @Override
+        public void initBinder(WebDataBinder binder) {
+            super.initBinder(binder);
+            binder.setAutoGrowNestedPaths(true);
+            //配置集合上限数量
+            binder.setAutoGrowCollectionLimit(10000);
+        }
+    }
+}
