@@ -1,0 +1,53 @@
+public class FieldTreeUtil {
+
+    public  List<FiledTreeNodeDTO> getResult(List<List<Object>> dataList, Map<Object,String> pMap) throws Exception{
+        List<List<FiledTreeNodeDTO>> noteList = new LinkedList<>();
+        for (List<Object> data : dataList) {
+            noteList.add(dealChildList(data,pMap));
+        }
+        List<FiledTreeNodeDTO> roots = noteList.get(0);
+        addChild(roots,noteList,0);
+        return roots;
+    }
+
+    public  void addChild(List<FiledTreeNodeDTO> parentDtos,List<List<FiledTreeNodeDTO>> noteList,int parentIndex) throws Exception{
+        if(parentIndex == noteList.size()-1){
+            return;
+        }
+        List<FiledTreeNodeDTO> childDtos = noteList.get(parentIndex+1);
+        if (CollectionUtils.isEmpty(childDtos)){
+            return;
+        }
+        for (FiledTreeNodeDTO parent :  parentDtos) {
+            List<FiledTreeNodeDTO> childrens = new ArrayList<>(childDtos.size());
+            parent.setChildList(childrens);
+            for (FiledTreeNodeDTO child : childDtos) {
+                if (parent.getField().contains((String) child.getName())) {
+                    FiledTreeNodeDTO temp = new FiledTreeNodeDTO();
+                    temp.setId(parent.getId() + "/" + child.getName());
+                    temp.setName(StringUtils.isNotBlank((CharSequence) child.getName())?child.getName():"-");
+                    temp.setField(child.getField());
+                    temp.setOriginName(child.getOriginName());
+                    childrens.add(temp);
+                    addChild(childrens, noteList, parentIndex + 1);
+                }
+            }
+        }
+    }
+    public  List<FiledTreeNodeDTO> dealChildList(List<Object> dataList, Map<Object,String> pMap) {
+        List<FiledTreeNodeDTO> list = new ArrayList<>();
+        dataList.forEach(k -> {
+            FiledTreeNodeDTO treeNodeDTO = new FiledTreeNodeDTO();
+            treeNodeDTO.setName(k);
+            treeNodeDTO.setId((String) k);
+            treeNodeDTO.setField(pMap.get(k));
+            list.add(treeNodeDTO);
+        });
+        return list;
+    }
+    public static void main(String[] args) {
+
+
+      
+
+    }
