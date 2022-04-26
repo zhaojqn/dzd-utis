@@ -74,6 +74,7 @@ public class CommonThreadPool {
             }
         });
     }
+    
 
     public void setCorePoolSize(int corePoolSize) {
         this.corePoolSize = corePoolSize;
