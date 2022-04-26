@@ -1,0 +1,35 @@
+public class StrUtil {
+    public static String join(Iterable<?> iterable, String separator, String prefix, String suffix) {
+        return iterable == null ? null : join(iterable.iterator(), separator, prefix, suffix);
+    }
+
+    public static String join(Iterator<?> iterator, String separator, String prefix, String suffix) {
+        if (iterator == null) {
+            return null;
+        } else if (!iterator.hasNext()) {
+            return "";
+        } else {
+            Object first = iterator.next();
+            if (!iterator.hasNext()) {
+                return Objects.toString(prefix + first + suffix, "");
+            } else {
+                StringBuilder buf = new StringBuilder(256);
+                if (first != null) {
+                    buf.append(prefix).append(first).append(suffix);
+                }
+
+                while (iterator.hasNext()) {
+                    if (separator != null) {
+                        buf.append(separator);
+                    }
+
+                    Object obj = iterator.next();
+                    if (obj != null) {
+                        buf.append(prefix).append(obj).append(suffix);
+                    }
+                }
+
+                return buf.toString();
+            }
+        }
+    }
