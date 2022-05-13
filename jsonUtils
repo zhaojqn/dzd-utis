@@ -1,0 +1,9 @@
+/**
+*
+* 美化JSON
+*/
+public void formatJson(String json) {
+String json  = JSON.toJSONString(object, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, 
+            SerializerFeature.WriteDateUseDateFormat);
+
+}
