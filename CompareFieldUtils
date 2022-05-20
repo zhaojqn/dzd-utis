@@ -1,0 +1,63 @@
+ /**
+     * 比较两个不同实体属性值
+     * @param sourceObj 原对象
+     * @param currentObj 当前对象
+     * @param compareArr 需要比较的字段
+     * @return
+     */
+    public static Map<String, Object> compareFields(Object sourceObj, Object currentObj, String[] compareArr, String[] ignoreArr) {
+        try{
+            Map<String, Object> map = new HashMap<String, Object>();
+            Map<String, Object> oldValueMap = new HashMap<String, Object>();
+            List<String> compareList = (compareArr == null || compareArr.length == 0)?null: Arrays.asList(compareArr);
+            List<String> ignoreList =  (ignoreArr == null || ignoreArr.length == 0)?null:Arrays.asList(ignoreArr);
+            Class clazz = sourceObj.getClass();
+            Class clazz_current = currentObj.getClass();
+            // 获取object的属性描述
+            PropertyDescriptor[] pds = Introspector.getBeanInfo(clazz, Object.class).getPropertyDescriptors();
+//            BeanInfo current_bean = Introspector.getBeanInfo(clazz_current, Object.class);
+            for (PropertyDescriptor pd : pds) {// 这里就是所有的属性了
+                String name = pd.getName();// 属性名
+                //比较字段不为空，且当前字段不在比较的范围内
+                if(compareList != null && !compareList.contains(name)){
+                    continue;
+                }
+                //忽略字段不为空，且当前字段在忽略的范围内
+
+                if(ignoreList != null && ignoreList.contains(name)){
+                    continue;
+                }
+                Method readMethod = pd.getReadMethod();// get方法
+                // 在sourceObj上调用get方法等同于获得sourceObj的属性值
+                Object o1 = readMethod.invoke(sourceObj);
+                // 在currentObj上调用get方法等同于获得currentObj的属性值
+                Method readMethod_current = clazz_current.getMethod("get"+ name.substring(0,1).toUpperCase() + name.substring(1));
+                Object o2 = readMethod_current.invoke(currentObj);
+                if(o1 instanceof Timestamp){
+                    o1 = new Date(((Timestamp) o1).getTime());
+                }
+                if(o2 instanceof Timestamp){
+                    o2 = new Date(((Timestamp) o2).getTime());
+                }
+                if(o1 == null && o2 == null){
+                    continue;
+                }else if(o1 == null && o2 != null){
+                    map.put(name, o2);
+                    oldValueMap.put(name, 01);
+                    continue;
+                }
+                if (!o1.equals(o2)) {// 比较这两个值是否相等,不等就可以放入map
+                    map.put(name, o2);
+                    oldValueMap.put(name, 01);
+                }
+            }
+            //将原始值记录起来，方便可查看差异，可按需去掉
+            if(!oldValueMap.isEmpty()) {
+                map.put("oldValueMap", JSONObject.toJSONString(oldValueMap));
+            }
+            return map;
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
